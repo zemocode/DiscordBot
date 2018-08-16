@@ -1,0 +1,229 @@
+import discord
+from discord.ext.commands import Bot
+from discord.ext import commands
+from random import randint
+import random
+import asyncio
+import pickle
+import os
+from itertools import cycle
+import time
+
+Client = discord.Client()
+status = ['put', 'whatever', 'you', 'want', 'your', 'bot', 'stauts', 'to', 'change', 'here']
+bot = commands.Bot(command_prefix='.') #This will be the prefix for your bot
+bot.remove_command("help")
+
+#-----------------OnStart------------------------------#
+
+#This just changes the status you added above. it will read the  'status = []' and read the text you added for it to cycle them.
+async def change_status():
+    await bot.wait_until_ready()
+    msgs = cycle(status)
+
+    while not bot.is_closed:
+        current_status = next(msgs)
+        await bot.change_presence(game=discord.Game(name=current_status))
+        await asyncio.sleep(5) #This is justa simple. the numbr () will just say howmany second between the status chnages
+
+@bot.event
+async def on_ready():
+    print("Bot is online")
+
+@bot.event
+async def on_member_join(member):
+    role = discord.utils.get(member.server.roles, name='-=-Member-=-')
+    await bot.add_roles(member, role)
+
+#-----------------Command stuff------------------------------#
+@bot.command(pass_context=True)
+async def ip(ctx): #This is the command for .ip
+    embed = discord.Embed(
+        colour = discord.Colour.red()
+    )
+
+    embed.add_field(name="CrestServers", value="CrestPVP.Minehut.GG", inline=True) #This string will spit out the ip of my server
+    await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def rules(ctx): #This is the rules command.
+    embed = discord.Embed( #This starts the embed
+        colour = discord.Colour.blue()
+    )
+
+    embed.add_field(name="1", value="Dont be rude to staff", inline=True) #These "embed.add_field(name="", value="", inline=True" is the comamnd it will spit out with the embed. name will be the catagory. and value will be what it says. 
+    embed.add_field(name="2", value="Follow al the rules {obviously}", inline=True)
+    embed.add_field(name="3", value="Dont abuse your role", inline=True)
+    embed.add_field(name="4", value="Use all commands in #bot_command", inline=True)
+    embed.add_field(name="5", value="Dont cuss. Cussing will result in a mute. ", inline=True)
+    await bot.say(embed=embed) #This is just the embed
+
+@bot.command(pass_context=True)
+async def infop(ctx, user: discord.Member):#user: discord.Member is wha toyu have to put afterwards. The command willl NOT work unless you have. .infop <@username#0000>
+    embed = discord.Embed(title="{}'s info".format(user.name), description="Info You Looking Foe?.", color=0xFF0000)
+    embed.add_field(name="Name", value=user.name, inline=True) #Gives the username without the @ and #
+    embed.add_field(name="ID", value=user.id, inline=True) #Give id of the user you tagged
+    embed.add_field(name="Status", value=user.status, inline=True) #Gives status of the user. online, dnd, offline, etc.
+    embed.add_field(name="Highest role", value=user.top_role) #Tells you the highest role of that user.
+    embed.add_field(name="Joined", value=user.joined_at) #Give you the date and time the user joined.
+    await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def serverinfo(ctx):
+    embed = discord.Embed(name="{}'s info".format(ctx.message.server.name), description="Info You Looking Foe?.", color=0xFF0000)
+    embed.set_author(name="CrestServer")
+    embed.add_field(name="Name", value=ctx.message.server.name, inline=True)
+    embed.add_field(name="ID", value=ctx.message.server.id, inline=True)
+    embed.add_field(name="Roles", value=len(ctx.message.server.roles), inline=True)
+    embed.add_field(name="Members", value=len(ctx.message.server.members))
+    await bot.say(embed=embed)
+
+@bot.command(pass_context=True)
+async def ping(ctx):
+    await bot.say("PING!") #Just says PING.
+
+
+
+@bot.command(pass_context=True)
+async def help(ctx):
+    await bot.say("``You have been sent help in your dm's``")    
+    author = ctx.message.author
+    embed = discord.Embed(
+        colour = discord.Colour.blue()
+    )
+
+    embed.set_author(name='Help') #This will be the title of the WHOLE ENTIRE message.
+    embed.add_field(name="----ExtraCmds---", value="Just random other commands.", inline=True) #These "embed.add_field(name="", value="", inline=True" is the comamnd it will spit out with the embed. name will be the catagory. and value will be what it says. 
+    embed.add_field(name=".serverinfo", value="This command will give you info about the server.", inline=True)
+    embed.add_field(name=".version", value="This command will tell you what version of the bot it is.", inline=True)    
+    embed.add_field(name=".infop {person}", value="This command will give you info on the person you tag", inline=True)
+    embed.add_field(name=".credits", value="This command will tell you who all helped with the bot.", inline=True)     
+    embed.add_field(name=".youtube", value="This command will tell you all the youtubers in the discord and links to there channels", inline=True)
+    embed.add_field(name="----Games----", value="Games to play on the server.", inline=True)
+    embed.add_field(name=".rps", value="This is the RockPaperSiccord command. By typing .rps . The bot will spit out Rock, Paper, Or Siccors. It is totally random", inline=True)    
+    embed.add_field(name=".ball8", value="This is the 8ball command. By typing .ball8 <a question>. The bot will give you a Yes or NO answer. It is totally random", inline=True)
+    embed.add_field(name=".rn", value="By typing rn. The bot will give you a number between 1 - 10. It is totally random", inline=True)
+    embed.add_field(name=".flip", value="By typing flip <heads or tails>. This bot will play Heads or Tails with you. It is totally random", inline=True)
+    embed.add_field(name=".ping", value="This will give you a chance to play ping pong with the bot :)", inline=True)
+    embed.add_field(name="----Staff Commands----", value="Commands only accessable by Staff", inline=True)
+    embed.add_field(name=".clear", value="This command will delete all messages in the channel that its typed in. {``Staff Only``}", inline=True)
+    embed.add_field(name=".kick", value="This command will kick a user{``Staff only``}", inline=True)
+    embed.add_field(name=".ban", value="This command will ban a user{``Staff only``}", inline=True)
+    embed.add_field(name=".mute", value="This command will mute a user. {``Staff Only``}", inline=True)
+    embed.add_field(name="More Commands Coming Soon", value="Want me to add somethign to the bot? PM Me on discord. Zemo Graphics#5265", inline=True)
+    await bot.send_message(author, embed=embed) #This will message the author that typed .help
+
+@bot.command(pass_context=True)
+async def youtube(ctx): #Just tells you all the people in the discord server that ahs youtube channels. (just type your own in the embed part)
+    embed = discord.Embed(
+        colour = discord.Colour.blue()
+    )
+
+    embed.add_field(name="Xaw's YouTube!", value="https://www.youtube.com/channel/UCT1-u4AwOMUQ4fGuU1HgleA", inline=True)
+    await bot.say(embed=embed)
+    
+    
+
+@bot.command(pass_context=True)
+async def embed(ctx):
+    embed = discord.Embed(title="Info", description="Information You Are Lookign For", color=0xFF0000)
+    embed.set_footer(text="Enjoy!")
+    embed.set_author(name="CrestServers")
+    embed.add_field(name="Test", value="Test1", inline=True)
+    await bot.say(embed=embed)
+
+#-----------------Moderation------------------------------#
+
+@bot.command(pass_context=True)
+async def kick(ctx, user: discord.Member):
+   if [role for role in ctx.message.author.roles if role.id in["444115331863150593"]]: #This only allows access to the role you put.
+        await bot.say(":boot: Person has been kicked.! {}. Better luck next time!".format(user.name))
+        await bot.kick(user)
+   if [role for role in ctx.message.author.roles if role.id in["479142616873697282"]]:
+        await bot.say("Congrats! You know the kick command! Use it wisely!")
+        await bot.say(":boot: Person has been kicked.! {}. Better luck next time!".format(user.name))
+        await bot.kick(user)
+   else: #If the user that typed this command .kick will jsut get the messgae as listed saying they cant kick anyone.
+       await bot.say("This command is only usuable for the staff!")
+
+@bot.command(pass_context=True)
+async def clear(ctx, ammount=300):
+    channel = ctx.message.channel
+    messages = []
+    async for message in bot.logs_from(channel):
+        messages.append(message)
+   if [role for role in ctx.message.author.roles if role.id in["444115331863150593"]]:
+		await bot.delete_messages(messages)
+		await bot.say('Messages Deleted')
+		await bot.delete_messages(messages)
+
+@bot.command(pass_context=True)
+async def mute(ctx, user: discord.Member):
+    if ctx.message.author.server_permissions.kick_members:
+        role = discord.utils.get(user.server.roles, name="Muted")
+        embed = discord.Embed(title="{} has been muted!".format(user.name), description="When the user needs unmuting do .unmute {}!" , color=0x0072ff)
+        embed.set_footer(text="Next time. Follow the rules.")
+        embed.set_thumbnail(url=user.avatar_url)
+        await bot.add_roles(user, role)
+        await bot.say(embed=embed)
+    else:
+       embed = discord.Embed(title="Permission Denied.", description="You don't have permission to use this command.", color=0xff0000)
+       embed.set_footer(text="Sorry.")
+       await bot.say(embed=embed)
+
+
+@bot.command(pass_context=True)
+async def ban(ctx, user: discord.Member):
+    if [role for role in ctx.message.author.roles if role.id in["444115331863150593"]]:
+        await bot.say(":hammer: Person has been banned! {}. Dont come back!".format(user.name))
+        await bot.ban(user)
+    else:
+       await bot.say("This command is only usuable for the staff!")
+
+#-----------------TESTING------------------------------#
+
+#These commands are as simple as can be. 
+
+
+@bot.command(pass_context=True)
+async def flip(ctx):
+    flip = random.choice(["Heads","Tails"]) #Flip is just what the command is. if a user types flip then the bot will send the output.
+    await bot.say(flip) #This is the output of twhat the bot will say. (flip) is just saying that the string "    flip = random.choice(["Heads","Tails"])   " will jsut send a random choice of the two selected.
+
+@bot.command(pass_context=True)
+async def rn(ctx):
+    rn = random.choice(["1","2","3","4","5","6","7","8","9","10"])
+    await bot.say(rn)
+
+@bot.command(pass_context=True)
+async def rps(ctx):
+    rps = random.choice(["rock","paper","siccors"])
+    await bot.say(rps)
+
+@bot.command(pass_context=True)
+async def credits(ctx):
+    await bot.say("Bot was fully coded by @Zemo Graphics#5265 . With some help from MisterBasic. He helped with some errors, I had got.")
+
+@bot.command(pass_context=True)
+async def version(ctx):
+    await bot.say("Version 1.0")
+
+
+@bot.command(pass_context=True)
+async def links(ctx):
+    embed = discord.Embed(
+        colour = discord.Colour.green()
+    )
+
+    embed.add_field(name="Forums", value="Crestpvp.forums.gg", inline=True)
+    embed.add_field(name="Partners Discord", value="No partners yet :(", inline=True)
+    await bot.say(embed=embed)
+
+
+@bot.command(pass_context=True)
+async def ball8(ctx):
+    ball8 = random.choice(["Yes","No"])
+    await bot.say(ball8)
+
+bot.loop.create_task(change_status()) #This will change the status of yhe command you added
+bot.run("TOKEN")
