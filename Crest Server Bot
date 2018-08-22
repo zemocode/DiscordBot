@@ -265,4 +265,4 @@ async def ball8(ctx):
     await bot.say(ball8)
 
 bot.loop.create_task(change_status()) #This will change the status of yhe command you added
-bot.run("NDc0Njc1NTk4NTAyMDAyNjg4.Dkgkuw.P2EQnF07lNZD2BfDCAm5BgHn06g")
+bot.run("BOT_TOKEN")
