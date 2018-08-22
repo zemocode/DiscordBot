@@ -6,11 +6,12 @@ import random
 import asyncio
 import pickle
 import os
+import json
 from itertools import cycle
 import time
 
 Client = discord.Client()
-status = ['put', 'whatever', 'you', 'want', 'your', 'bot', 'stauts', 'to', 'change', 'here']
+status = ['Just', 'Being', 'Updated']
 bot = commands.Bot(command_prefix='.') #This will be the prefix for your bot
 bot.remove_command("help")
 
@@ -28,21 +29,55 @@ async def change_status():
 
 @bot.event
 async def on_ready():
-    print("Bot is online")
+    print("Back Online Bois!")
 
 @bot.event
 async def on_member_join(member):
-    role = discord.utils.get(member.server.roles, name='-=-Member-=-')
+    role = discord.utils.get(member.server.roles, name='(-) Member (-)')
     await bot.add_roles(member, role)
+    channel = member.server.get_channel("444111695921807360")
+    await bot.send_message(channel, "OMG! Thanks so much for joining. I hope you enjoy your stay! Wanna invite some friends to come play? Heres a link! https://discord.gg/YknHKGC")
+
+@bot.event
+async def on_member_remove(member):
+    channel = member.server.get_channel("479509304332910602")
+    await bot.send_message(channel, "Dang. That sucks! Glad you stopped by!")
+
+@bot.command(pass_context=True)
+async def fiverr(ctx):
+	await bot.say("My name is CrestBot and i was coded by ZemoGraphics or ZemoLog. You should purchase this fiverr gig. He makes amazing bots and even made me! I have over 28 diffrent commands!")
+	
+@bot.command(pass_context=True)
+async def roast(ctx):
+        with open("roast_file1.pk1", "rb") as f:
+                roast_list = pickle.load(f)
+        await bot.say(random.choice(roast_list))
+
+@bot.command(pass_context=True)
+async def addroast(ctx, *args):
+        if not os.path.isfile("roast_file1.pk1"):
+            # roast_list = []
+        else:
+            with open("roast_file1.pk1", "rb") as f:
+                roast_list = pickle.load(f)
+        roast_list.append(" ".join(args))
+        with open("roast_file1.pk1", "wb") as f:
+            pickle.dump(roast_list, f)
+			
+
+
 
 #-----------------Command stuff------------------------------#
 @bot.command(pass_context=True)
-async def ip(ctx): #This is the command for .ip
+async def ips(ctx): #This is the command for .ip
     embed = discord.Embed(
         colour = discord.Colour.red()
     )
 
-    embed.add_field(name="CrestServers", value="CrestPVP.Minehut.GG", inline=True) #This string will spit out the ip of my server
+    embed.add_field(name="CrestPVP - Minehut", value="CrestPVP.Minehut.GG", inline=True) #This string will spit out the ip of my server
+    embed.add_field(name="TheStreets - Owned By MisterBasic", value="TheStreets.Minehut,GG", inline=True)
+    embed.add_field(name="Blixate - Owned By MisterBasic", value="", inline=True)
+    embed.add_field(name="CrestSoup", value="No Ip Is Set", inline=True)
     await bot.say(embed=embed)
 
 @bot.command(pass_context=True)
@@ -99,6 +134,7 @@ async def help(ctx):
     embed.add_field(name=".infop {person}", value="This command will give you info on the person you tag", inline=True)
     embed.add_field(name=".credits", value="This command will tell you who all helped with the bot.", inline=True)     
     embed.add_field(name=".youtube", value="This command will tell you all the youtubers in the discord and links to there channels", inline=True)
+    embed.add_field(name=".ips", value="This command will list all servers ossociated with or owned by CrestServers", inline=True)
     embed.add_field(name="----Games----", value="Games to play on the server.", inline=True)
     embed.add_field(name=".rps", value="This is the RockPaperSiccord command. By typing .rps . The bot will spit out Rock, Paper, Or Siccors. It is totally random", inline=True)    
     embed.add_field(name=".ball8", value="This is the 8ball command. By typing .ball8 <a question>. The bot will give you a Yes or NO answer. It is totally random", inline=True)
@@ -113,6 +149,7 @@ async def help(ctx):
     embed.add_field(name="More Commands Coming Soon", value="Want me to add somethign to the bot? PM Me on discord. Zemo Graphics#5265", inline=True)
     await bot.send_message(author, embed=embed) #This will message the author that typed .help
 
+	
 @bot.command(pass_context=True)
 async def youtube(ctx): #Just tells you all the people in the discord server that ahs youtube channels. (just type your own in the embed part)
     embed = discord.Embed(
@@ -146,16 +183,18 @@ async def kick(ctx, user: discord.Member):
    else: #If the user that typed this command .kick will jsut get the messgae as listed saying they cant kick anyone.
        await bot.say("This command is only usuable for the staff!")
 
+
 @bot.command(pass_context=True)
 async def clear(ctx, ammount=300):
+   if [role for role in ctx.message.author.roles if role.id in["444115331863150593"]]:
     channel = ctx.message.channel
     messages = []
     async for message in bot.logs_from(channel):
-        messages.append(message)
-   if [role for role in ctx.message.author.roles if role.id in["444115331863150593"]]:
-		await bot.delete_messages(messages)
-		await bot.say('Messages Deleted')
-		await bot.delete_messages(messages)
+            messages.append(message)
+    await bot.delete_messages(messages)
+    await bot.say('Messages Deleted')
+    await bot.delete_messages(messages)
+
 
 @bot.command(pass_context=True)
 async def mute(ctx, user: discord.Member):
@@ -226,4 +265,4 @@ async def ball8(ctx):
     await bot.say(ball8)
 
 bot.loop.create_task(change_status()) #This will change the status of yhe command you added
-bot.run("TOKEN")
+bot.run("NDc0Njc1NTk4NTAyMDAyNjg4.Dkgkuw.P2EQnF07lNZD2BfDCAm5BgHn06g")
